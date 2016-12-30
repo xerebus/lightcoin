@@ -18,3 +18,36 @@ div.login-button {
     margin-top: 5px;
 
 }
+
+input {
+
+    border: 1px solid black;
+    border-radius: 3px;
+
+    height: 20px;
+
+    background: none;
+
+}
+
+button {
+
+    border: 1px solid black;
+    border-radius: 3px;
+
+    background: none;
+    padding: 5px;
+
+}
+
+button:hover {
+
+    background: silver;
+
+}
+
+button:active {
+
+    background: gray;
+
+}
