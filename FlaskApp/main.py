@@ -9,6 +9,8 @@ import sys
 from flask import Flask, render_template, request, redirect, session
 from flask.ext.mysql import MySQL
 
+from werkzeug import generate_password_hash, check_password_hash
+
 app = Flask(__name__)
 app.secret_key = 'secret_key' # TODO: change
 mysql = MySQL()
@@ -44,8 +46,7 @@ def login():
         
         # validate user
         if data:
-            password = data[0]
-            if request.form['password'] == password:
+            if check_password_hash(data[0], request.form['password']):
 
                 # register session
                 session['user'] = request.form['username']
