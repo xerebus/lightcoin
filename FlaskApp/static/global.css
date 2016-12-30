@@ -1,0 +1,44 @@
+/* global sans-serif font */
+
+body {
+
+    font-family: sans-serif;
+
+}
+
+
+/* form elements */
+
+
+input {
+
+    border: 1px solid black;
+    border-radius: 3px;
+
+    height: 20px;
+
+    background: none;
+
+}
+
+button {
+
+    border: 1px solid black;
+    border-radius: 3px;
+
+    background: none;
+    padding: 3px;
+
+}
+
+button:hover {
+
+    background: silver;
+
+}
+
+button:active {
+
+    background: gray;
+
+}
