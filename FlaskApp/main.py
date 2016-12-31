@@ -26,7 +26,10 @@ mysql.init_app(app)
 
 @app.route('/')
 def main():
-    '''Display a login prompt.'''
+    '''Display a login prompt, or redirect to home if user is logged in.'''
+
+    if session.get('user'):
+        return redirect('/home')
 
     return render_template('index.html')
 
