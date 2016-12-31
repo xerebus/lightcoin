@@ -1,10 +1,13 @@
 /* get rid of automatic link styling */
+
 a {
 
     color: black;
     text-decoration: none;
 
 }
+
+/* header */
 
 div.header {
 
@@ -44,3 +47,37 @@ div.header a.logo {
 
 }
 
+/* footer, used for small status messages */
+
+div.footer {
+
+    margin-top: 20px;
+
+    font-size: small;
+    text-align: right;
+
+}
+
+/* table display */
+
+table {
+    
+    width: 100%;
+    text-align: left;
+
+    margin-top: 15px;
+
+}
+
+table th {
+
+    background: lightgray;
+    padding: 10px;
+
+}
+
+table td {
+
+    padding: 10px;
+
+}

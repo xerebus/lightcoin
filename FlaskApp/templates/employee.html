@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block pagetitle %}Homepage{% endblock %}
+
+{% block content %}
+
+<table>
+
+    <tr>
+        <th>Username</th>
+        <th>Account Created On</th>
+        <th>Privelege Level</th>
+    </tr>
+    
+    {% for (username, date_created, priv) in employees %}
+    <tr>
+        <td>{{ username }}</td>
+        <td>{{ date_created }}</td>
+        <td>{{ priv }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+
+{% endblock %}

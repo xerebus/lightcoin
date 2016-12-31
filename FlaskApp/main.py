@@ -83,14 +83,44 @@ def logout():
 def home():
     '''Display a default homepage.'''
 
-    if session.get('user'):
-        return render_template('home.html')
-    else:
+    # login-only page
+    if not session.get('user'):
         return render_template(
             'error.html',
             error = 'Unauthorized access.'
         )
+
+    return render_template('home.html', user = session.get('user'))
+
+@app.route('/employee')
+def employee():
+    '''List employees and allow adding a new employee.'''
+    
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    # fetch employee data
+    cursor.callproc('GetEmployees')
+    employees = cursor.fetchall()
         
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'employee.html',
+        user = session.get('user'),
+        employees = employees
+    )
+
 
 if __name__ == '__main__':
     app.run(debug = True)

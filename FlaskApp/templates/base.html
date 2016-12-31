@@ -26,7 +26,7 @@
         <a>Report Breakage</a>
 
         <a class="right" href="/logout">Log Out</a>
-        <a class="right">Employees</a>
+        <a class="right" href="/employee">Employees</a>
         <a class="right">Products</a>
         <a class="right">Vendors</a>
         <a class="right">Customers</a>
@@ -39,6 +39,11 @@
     {% endblock %}
     </div>
     
+    <div class="footer">
+    {% block footer %}
+    logged in as <strong>{{ user }}</strong>
+    {% endblock %}
+    </div>
 
 </body>
 
