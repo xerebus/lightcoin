@@ -58,6 +58,22 @@ div.footer {
 
 }
 
+/* content */
+
+div.content {
+
+    margin-top: 28px;
+
+}
+
+/* text sizes */
+
+h1  {
+
+    font-size: 18px;
+
+}
+
 /* table display */
 
 table {
@@ -79,5 +95,13 @@ table th {
 table td {
 
     padding: 10px;
+
+}
+
+/* space to use as needed between elements */
+
+span.space {
+
+    width: 100px;
 
 }

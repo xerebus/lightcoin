@@ -11,6 +11,8 @@ from flask.ext.mysql import MySQL
 
 from werkzeug import generate_password_hash, check_password_hash
 
+import time
+
 app = Flask(__name__)
 app.secret_key = 'secret_key' # TODO: change
 mysql = MySQL()
@@ -28,7 +30,7 @@ def main():
 
     return render_template('index.html')
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route('/login', methods = ['POST', 'GET'])
 def login():
     '''Validate the user's credentials and redirect them to the lightcoin
     console.'''
@@ -121,6 +123,76 @@ def employee():
         employees = employees
     )
 
+@app.route('/employee_add', methods = ['POST'])
+def add_employee():
+    '''Adds a new employee to the employee table. If username already exists,
+    the SQL stored procedure makes no modifications.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # make sure passwords match
+        if request.form['password'] != request.form['confirm_password']:
+            return render_template(
+                'error.html',
+                error = 'Passwords did not match.'
+            )
+            
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # attempt to add employee
+        
+        args = (
+            request.form['username'],
+            request.form['password'],
+            time.strftime('%Y%m%d'),
+            request.form['priv']
+        )
+        cursor.callproc('CreateUser', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/employee')
+
+@app.route('/employee_delete', methods = ['POST'])
+def delete_employee():
+    '''Deletes an employee from the employee table.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # delete user
+        args = (request.form['username'],)
+        cursor.callproc('DeleteUser', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/employee')
 
 if __name__ == '__main__':
     app.run(debug = True)

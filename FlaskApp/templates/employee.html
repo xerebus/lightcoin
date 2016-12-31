@@ -3,12 +3,17 @@
 
 {% block content %}
 
+<h1>Employees</h1>
+
+<form action="/employee_delete" method="POST">
+
 <table>
 
     <tr>
         <th>Username</th>
         <th>Account Created On</th>
         <th>Privelege Level</th>
+        <th>Modify</th>
     </tr>
     
     {% for (username, date_created, priv) in employees %}
@@ -16,10 +21,51 @@
         <td>{{ username }}</td>
         <td>{{ date_created }}</td>
         <td>{{ priv }}</td>
+        <td>
+            <button name="username" value="{{ username }}"
+            type="submit">Delete</button>
+        </td>
     </tr>
     {% endfor %}
+    
 
 </table>
+
+</form>
+
+<h1>Add Employee</h1>
+
+<form action="/employee_add" method="POST">
+
+<table>
+
+    <tr>
+
+        <td>
+            <input type="text" name="username" placeholder="Username">
+        </td>
+
+        <td>
+            <input type="password" name="password" placeholder="Password"/>
+        </td>
+        
+        <td>
+            <input type="password" name="confirm_password"
+            placeholder="Confirm Password" />
+        </td>
+
+        <td>
+            <input type="text" name="priv" placeholder="Privilege Level" />
+        </td>
+
+        <td>
+            <button action=type="submit">Add</button>
+        </td>
+    </tr>
+</table>
+
+</form>
+
 
 
 {% endblock %}
