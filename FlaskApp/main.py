@@ -72,12 +72,19 @@ def login():
     else:
         return redirect('/')
 
+@app.route('/logout')
+def logout():
+    '''Takes the user back to the login screen.'''
+
+    session.pop('user', None)
+    return redirect('/')
+
 @app.route('/home')
 def home():
-    '''TODO: home. For now, just a successful login message.'''
+    '''Display a default homepage.'''
 
     if session.get('user'):
-        return render_template('sale.html')
+        return render_template('home.html')
     else:
         return render_template(
             'error.html',

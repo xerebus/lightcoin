@@ -1,3 +1,11 @@
+/* get rid of automatic link styling */
+a {
+
+    color: black;
+    text-decoration: none;
+
+}
+
 div.header {
 
     background: silver;
@@ -12,15 +20,19 @@ div.header a {
     padding: 5px;
     float: left;
 
+    margin-left: 5px;
+    margin-right: 5px;
+
 }
 
 div.header a:hover {
 
     background: gray;
+    color: white;
 
 }
 
-div.header a.admin {
+div.header a.right {
 
     float: right;
 
