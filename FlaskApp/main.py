@@ -13,6 +13,8 @@ from werkzeug import generate_password_hash, check_password_hash
 
 import time
 
+## INITIALIZATION
+
 app = Flask(__name__)
 app.secret_key = 'secret_key' # TODO: change
 mysql = MySQL()
@@ -23,6 +25,8 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'admin'
 app.config['MYSQL_DATABASE_DB'] = 'store'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
+
+## LOGIN AND LOGOUT
 
 @app.route('/')
 def main():
@@ -84,6 +88,8 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
+## HOME SCREEN
+
 @app.route('/home')
 def home():
     '''Display a default homepage.'''
@@ -96,6 +102,8 @@ def home():
         )
 
     return render_template('home.html', user = session.get('user'))
+
+## EMPLOYEE/USER MANAGEMENT
 
 @app.route('/employee')
 def employee():
