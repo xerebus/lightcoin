@@ -77,13 +77,12 @@ def home():
     '''TODO: home. For now, just a successful login message.'''
 
     if session.get('user'):
-        return 'You got in!'
+        return render_template('sale.html')
     else:
         return render_template(
             'error.html',
             error = 'Unauthorized access.'
         )
-    return "nothing to see here"
         
 
 if __name__ == '__main__':

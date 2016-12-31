@@ -1,8 +1,17 @@
-/* global sans-serif font */
-
 body {
 
     font-family: sans-serif;
+
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 2%;
+
+}
+
+div.content {
+
+    margin-left: 15px;
+    margin-right: 15px;
 
 }
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% block head %}
+    
+    <title>lightcoin - {% block pagetitle %}{% endblock %}</title>
+
+    <link rel="stylesheet" type="text/css" href="static/global.css" />
+    <link rel="stylesheet" type="text/css" href="static/interface.css" />
+
+    {% endblock %}
+
+</head>
+
+<body>
+
+    <div class="header">
+    {% block header %}
+
+        <a class="logo">lightcoin</a>
+
+        <a>Make Sale</a>
+        <a>Record Order</a>
+        <a>Report Breakage</a>
+
+        <a class="admin">My Account</a>
+
+    {% endblock %}
+    </div>
+
+    <div class="content"> 
+    {% block content %}
+    {% endblock %}
+    </div>
+    
+
+</body>
+
+</html>

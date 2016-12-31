@@ -1,0 +1,34 @@
+div.header {
+
+    background: silver;
+    padding: 10px;
+
+    overflow: auto;
+
+}
+
+div.header a {
+
+    padding: 5px;
+    float: left;
+
+}
+
+div.header a:hover {
+
+    background: gray;
+
+}
+
+div.header a.admin {
+
+    float: right;
+
+}
+
+div.header a.logo {
+
+    font-weight: bold;
+
+}
+
