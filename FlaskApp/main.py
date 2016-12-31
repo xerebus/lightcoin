@@ -153,7 +153,7 @@ def add_employee():
         
         args = (
             request.form['username'],
-            request.form['password'],
+            generate_password_hash(request.form['password']),
             time.strftime('%Y%m%d'),
             request.form['priv']
         )
