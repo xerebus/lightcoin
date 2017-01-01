@@ -104,6 +104,12 @@ table td {
 
 }
 
+table td.action {
+
+    text-align: right;
+
+}
+
 /* space to use as needed between elements */
 
 span.space {
