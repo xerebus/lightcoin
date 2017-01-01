@@ -17,12 +17,12 @@ import time
 ## INITIALIZATION
 
 app = Flask(__name__)
-app.secret_key = 'secret_key' # TODO: change
+app.secret_key = '\xee\x81\t3\x1c\x0c\xe6\xbf\x85\xb6F\xfe\x18\x02\xe8\xe0Q8a\xf83\xe8\xbd\xdc'
 mysql = MySQL()
 
 # enter MySQL database
-app.config['MYSQL_DATABASE_USER'] = 'root'  # TODO: change, this is very bad
-app.config['MYSQL_DATABASE_PASSWORD'] = 'admin'
+app.config['MYSQL_DATABASE_USER'] = 'lightcoin'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'lightcoin_key'
 app.config['MYSQL_DATABASE_DB'] = 'store'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
