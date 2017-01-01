@@ -13,6 +13,7 @@
     &nbsp;
     <button name="page" value={{ page|int + 1 }}>next</button>
 </p>
+</form>
 
 <form action="/product_delete" method="POST">
 
@@ -50,7 +51,7 @@
 
 </form>
 
-<h1>Add Product</h1>
+<h1>Add New Product</h1>
 
 <form action="/product_line_add" method="POST">
 
@@ -68,6 +69,42 @@
         
         <td>
             <input type="text" name="name" placeholder="Product Name">
+        </td>
+        
+        <td>
+            <input type="text" name="pack_size" placeholder="Pack Size">
+        </td>
+        
+        <td>
+            <input type="text" name="cost" placeholder="Cost Price">
+        </td>
+        
+        <td>
+            <input type="text" name="sale" placeholder="Sale Price">
+        </td>
+
+        <td>
+            <button action=type="submit">Add</button>
+        </td>
+    </tr>
+</table>
+
+</form>
+
+<h1>Add New Pack Size of Existing Product</h1>
+
+<form action="/product_add" method="POST">
+
+<table>
+
+    <tr>
+
+        <td>
+            <input type="text" name="upc" placeholder="UPC">
+        </td>
+        
+        <td>
+            <input type="text" name="pid" placeholder="Product Line ID">
         </td>
         
         <td>

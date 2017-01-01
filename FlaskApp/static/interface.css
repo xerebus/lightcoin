@@ -76,6 +76,12 @@ h1  {
 
 /* table display */
 
+p.pagination {
+
+    text-align: center;
+
+}
+
 table {
     
     width: 100%;

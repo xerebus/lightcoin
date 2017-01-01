@@ -13,6 +13,7 @@ from werkzeug import generate_password_hash, check_password_hash
 
 import time
 
+
 ## INITIALIZATION
 
 app = Flask(__name__)
@@ -25,6 +26,7 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'admin'
 app.config['MYSQL_DATABASE_DB'] = 'store'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
+
 
 ## LOGIN AND LOGOUT
 
@@ -88,6 +90,7 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
+
 ## HOME SCREEN
 
 @app.route('/home')
@@ -103,7 +106,8 @@ def home():
 
     return render_template('home.html', user = session.get('user'))
 
-## EMPLOYEE/USER MANAGEMENT
+
+## EMPLOYEE/USER MANAGEMENT INTERFACE
 
 @app.route('/employee')
 def employee():
@@ -204,6 +208,163 @@ def delete_employee():
         conn.close()
 
     return redirect('/employee')
+
+
+## PRODUCT MANAGEMENT INTERFACE
+
+@app.route('/product', methods=['POST', 'GET'])
+def product():
+    '''Display a paginated product list, with options to
+    add a new product (new entry in product_line) or a new pack size
+    of an existing product.'''
+    
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # parse page number
+    if request.method == 'POST':
+        page = int(request.form['page'])
+    else:
+        page = 0
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    
+    # number of items per page
+    list_limit = 10
+
+    # fetch product data
+    args = (list_limit, page * list_limit)
+    cursor.callproc('GetProducts', args)
+    products = cursor.fetchall()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'product.html',
+        user = session.get('user'),
+        products = products,
+        page = page
+    )
+
+@app.route('/product_line_add', methods = ['POST'])
+def add_product():
+    '''Adds a new product. This corresponds to a new product_line as
+    well as a new product associated with that product_line -- both tables
+    are updated.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+
+        # attempt to add product
+        args = (
+            request.form['upc'],
+            request.form['pid'],
+            request.form['name'],
+            request.form['pack_size'],
+            request.form['cost'],
+            request.form['sale']
+        )
+        cursor.callproc('CreateProduct', args)
+        conn.commit()
+        
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/product')
+
+@app.route('/product_add', methods = ['POST'])
+def add_product_pack():
+    '''Adds a new pack size of an existing product. Product must already
+    exist in product_line.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+
+        # attempt to add product
+        args = (
+            request.form['upc'],
+            request.form['pid'],
+            request.form['pack_size'],
+            request.form['cost'],
+            request.form['sale']
+        )
+        cursor.callproc('CreateProductPack', args)
+        conn.commit()
+        
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/product')
+
+@app.route('/product_delete', methods = ['POST'])
+def delete_product_pack():
+    '''Delete a product pack. If this is the last pack of this product,
+    delete the product as well.'''
+
+    print(
+        "DELETING",
+        file = sys.stderr
+    )
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # delete product
+        print(
+            "Deleting UPC {}".format(request.form['upc']),
+            file = sys.stderr
+        )
+        args = (request.form['upc'],)
+        cursor.callproc('DeleteProduct', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/product')
 
 if __name__ == '__main__':
     app.run(debug = True)
