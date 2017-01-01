@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block pagetitle %}Vendors{% endblock %}
+
+{% block content %}
+
+<h1>Vendors</h1>
+
+<form action="/vendor" method="POST">
+<p class="pagination">
+    <button name="page" value={{ page|int - 1 }}>prev</button>
+    &nbsp;
+    Page {{ page|int + 1 }}
+    &nbsp;
+    <button name="page" value={{ page|int + 1 }}>next</button>
+</p>
+</form>
+
+<form action="/vendor_delete" method="POST">
+
+<table>
+
+    <tr>
+        <th>Name</th>
+        <th>Rating</th>
+        <th>Modify</th>
+    </tr>
+    
+    {% for (vid, name, rating) in vendors %}
+    <tr>
+        <td>{{ name }}</td>
+        <td>{{ rating }}</td>
+        <td>
+            <button name="vid" value="{{ vid }}"
+            type="submit">Delete</button>
+        </td>
+    </tr>
+    {% endfor %}
+    
+
+</table>
+
+</form>
+
+<h1>Add New Vendor</h1>
+
+<form action="/vendor_add" method="POST">
+
+<table>
+
+    <tr>
+
+        <td>
+            <input type="text" name="name" placeholder="Vendor Name">
+        </td>
+        
+        <td>
+            <input type="text" name="rating" placeholder="Rating">
+        </td>
+
+        <td>
+            <button action=type="submit">Add</button>
+        </td>
+    </tr>
+</table>
+
+</form>
+
+{% endblock %}

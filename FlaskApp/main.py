@@ -333,10 +333,108 @@ def delete_product_pack():
     '''Delete a product pack. If this is the last pack of this product,
     delete the product as well.'''
 
-    print(
-        "DELETING",
-        file = sys.stderr
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # delete product
+        args = (request.form['upc'],)
+        cursor.callproc('DeleteProduct', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/product')
+
+
+## CUSTOMER MANAGEMENT INTERFACE
+
+@app.route('/customer', methods=['POST', 'GET'])
+def customer():
+    '''Display customer list.'''
+    
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # parse page number
+    if request.method == 'POST':
+        page = int(request.form['page'])
+    else:
+        page = 0
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    
+    # number of items per page
+    list_limit = 10
+
+    # fetch product data
+    args = (list_limit, page * list_limit)
+    cursor.callproc('GetCustomers', args)
+    customers = cursor.fetchall()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'customer.html',
+        user = session.get('user'),
+        customers = customers,
+        page = page
     )
+
+@app.route('/customer_add', methods = ['POST'])
+def add_customer():
+    '''Add a new customer.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # attempt to add customer
+        args = (
+            request.form['name'],
+            request.form['phone']
+        )
+        cursor.callproc('CreateCustomer', args)
+        conn.commit()
+        
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/customer')
+
+@app.route('/customer_delete', methods = ['POST'])
+def delete_customer():
+    '''Delete a customer. TODO: deal with receipts referring to this
+    customer.'''
 
     # login-only page
     if not session.get('user'):
@@ -352,19 +450,118 @@ def delete_product_pack():
         cursor = conn.cursor()
 
         # delete product
-        print(
-            "Deleting UPC {}".format(request.form['upc']),
-            file = sys.stderr
-        )
-        args = (request.form['upc'],)
-        cursor.callproc('DeleteProduct', args)
+        args = (request.form['cid'],)
+        cursor.callproc('DeleteCustomer', args)
         conn.commit()
 
         # close connection
         cursor.close()
         conn.close()
 
-    return redirect('/product')
+    return redirect('/customer')
+
+
+## VENDOR MANAGEMENT INTERFACE
+
+@app.route('/vendor', methods=['POST', 'GET'])
+def vendor():
+    '''Display vendor list.'''
+    
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # parse page number
+    if request.method == 'POST':
+        page = int(request.form['page'])
+    else:
+        page = 0
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    
+    # number of items per page
+    list_limit = 10
+
+    # fetch product data
+    args = (list_limit, page * list_limit)
+    cursor.callproc('GetVendors', args)
+    vendors = cursor.fetchall()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'vendor.html',
+        user = session.get('user'),
+        vendors = vendors,
+        page = page
+    )
+
+@app.route('/vendor_add', methods = ['POST'])
+def add_vendor():
+    '''Add a new vendor.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # attempt to add vendor
+        args = (
+            request.form['name'],
+            request.form['rating']
+        )
+        cursor.callproc('CreateVendor', args)
+        conn.commit()
+        
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/vendor')
+
+@app.route('/vendor_delete', methods = ['POST'])
+def delete_vendor():
+    '''Delete a vendor. TODO: deal with orders referring to this
+    vendor.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # delete product
+        args = (request.form['vid'],)
+        cursor.callproc('DeleteVendor', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return redirect('/vendor')
 
 if __name__ == '__main__':
     app.run(debug = True)

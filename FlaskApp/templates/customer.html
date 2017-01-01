@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block pagetitle %}Customers{% endblock %}
+
+{% block content %}
+
+<h1>Customers</h1>
+
+<form action="/customer" method="POST">
+<p class="pagination">
+    <button name="page" value={{ page|int - 1 }}>prev</button>
+    &nbsp;
+    Page {{ page|int + 1 }}
+    &nbsp;
+    <button name="page" value={{ page|int + 1 }}>next</button>
+</p>
+</form>
+
+<form action="/customer_delete" method="POST">
+
+<table>
+
+    <tr>
+        <th>Name</th>
+        <th>Phone Number</th>
+        <th>Modify</th>
+    </tr>
+    
+    {% for (cid, name, phone) in customers %}
+    <tr>
+        <td>{{ name }}</td>
+        <td>{{ phone }}</td>
+        <td>
+            <button name="cid" value="{{ cid }}"
+            type="submit">Delete</button>
+        </td>
+    </tr>
+    {% endfor %}
+    
+
+</table>
+
+</form>
+
+<h1>Add New Customer</h1>
+
+<form action="/customer_add" method="POST">
+
+<table>
+
+    <tr>
+
+        <td>
+            <input type="text" name="name" placeholder="Full Name">
+        </td>
+        
+        <td>
+            <input type="text" name="phone" placeholder="Phone Number">
+        </td>
+
+        <td>
+            <button action=type="submit">Add</button>
+        </td>
+    </tr>
+</table>
+
+</form>
+
+{% endblock %}
