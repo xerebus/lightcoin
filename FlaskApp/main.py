@@ -563,5 +563,147 @@ def delete_vendor():
 
     return redirect('/vendor')
 
+
+## MAKE SALE INTERFACE
+
+@app.route('/sale_new')
+def new_sale():
+    '''Initiate a new sale and send the user to the sale page.'''
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    # start a sale and grab its transaction_id
+    args = (session.get('user'),)
+    cursor.callproc('StartSale', args)
+    sale_id = cursor.fetchone()[0]
+    conn.commit()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return sale(sale_id)
+
+def sale(sale_id):
+    '''List current sale and allow adding items.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    # show this sale
+    args = (sale_id,)
+    cursor.callproc('ViewSale', args)
+    items = cursor.fetchall()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'sale.html',
+        user = session.get('user'),
+        tid = sale_id,
+        items = items
+    )
+
+@app.route('/sale_add', methods = ['POST'])
+def add_to_sale():
+    '''Add an item to a sale. The SQL stored procedure handles updating
+    the quantity or adding a new line_item as needed.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # call 
+        args = (
+            request.form['upc'],
+            request.form['tid']
+        )
+        cursor.callproc('AddItemToSale', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return sale(request.form['tid'])
+
+@app.route('/sale_delete', methods = ['POST'])
+def delete_from_employee():
+    '''Removes a line item from a sale.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # delete user
+        args = (
+            request.form['upc'],
+            request.form['tid']
+        )
+        cursor.callproc('DeleteItemFromSale', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return sale(request.form['tid'])
+
+
+@app.route('/sale_checkout', methods = ['POST'])
+def finalize_sale():
+    '''Saves checkout information and calculates a sale's subtotal.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return 'TODO.'
+
 if __name__ == '__main__':
     app.run(debug = True)
