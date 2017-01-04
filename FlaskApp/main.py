@@ -605,6 +605,11 @@ def sale(sale_id):
     cursor.callproc('ViewSale', args)
     items = cursor.fetchall()
         
+    # grab subtotal and total
+    args = (sale_id,)
+    cursor.callproc('CalculateSaleTotal', args)
+    subtotal, tax, total = cursor.fetchone()
+
     # close connection
     cursor.close()
     conn.close()
@@ -613,7 +618,10 @@ def sale(sale_id):
         'sale.html',
         user = session.get('user'),
         tid = sale_id,
-        items = items
+        items = items,
+        subtotal = subtotal,
+        tax = tax,
+        total = total
     )
 
 @app.route('/sale_add', methods = ['POST'])
@@ -679,10 +687,9 @@ def delete_from_employee():
 
     return sale(request.form['tid'])
 
-
 @app.route('/sale_checkout', methods = ['POST'])
-def finalize_sale():
-    '''Saves checkout information and calculates a sale's subtotal.'''
+def checkout_sale():
+    '''Requests checkout information.'''
 
     # login-only page
     if not session.get('user'):
@@ -697,13 +704,80 @@ def finalize_sale():
         conn = mysql.connect()
         cursor = conn.cursor()
 
+        # grab subtotal and total
+        args = (request.form['tid'],)
+        cursor.callproc('CalculateSaleTotal', args)
+        subtotal, tax, total = cursor.fetchone()
+
+        # grab customers
+        args = (
+            200, # number of customers to show in dropdown
+            0 # start at beginning
+        )
+        cursor.callproc('GetCustomers', args)
+        customers = cursor.fetchall()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return render_template(
+            'sale_checkout.html',
+            user = session.get('user'),
+            tid = request.form['tid'],
+            subtotal = subtotal,
+            tax = tax,
+            total = total,
+            customers = customers
+    )
+
+@app.route('/sale_finalize', methods = ['POST'])
+def finalize_sale():
+    '''Records a sale.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+
+        # collect and save sale information
+        tid, total, tender = (
+            request.form['tid'],
+            request.form['total'],
+            request.form['tender']
+        )
+        args = (
+            tid,
+            total,
+            request.form['payment_method'],
+            request.form['cid'],
+            request.form['tax'],
+            tender
+        )
+        cursor.callproc('FinalizeSale', args)
         conn.commit()
 
         # close connection
         cursor.close()
         conn.close()
 
-    return 'TODO.'
+    return render_template(
+        'sale_done.html',
+        tid = tid,
+        total = total,
+        tender = tender,
+        change = str(float(tender) - float(total)),
+        user = session.get('user')
+    )
 
 if __name__ == '__main__':
     app.run(debug = True)

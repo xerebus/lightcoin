@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block pagetitle %}Make a Sale{% endblock %}
+
+{% block content %}
+
+<h1>Sale #{{ tid }}</h1>
+
+<table>
+
+    <tr>
+        <th>Total</th>
+        <th>Tender</th>
+        <th>Change Due</th>
+    </tr>
+    
+    <tr>
+        <td>{{ total }}</td>
+        <td>{{ tender }}</td>
+        <td>{{ change }}</td>
+    </tr>
+
+</table>
+
+<p>Sale completed.</p>
+
+{% endblock %}
