@@ -21,7 +21,7 @@
         <th>Transaction ID</th>
         <th>Transaction Type</th>
         <th>Amount</th>
-        <th>Date and Time</th>
+        <th>Submitted On</th>
         <th>Authorized By</th>
         <th class="action">View</th>
     </tr>
@@ -40,15 +40,34 @@
                 Unknown
             {% endif %}
         </td>
-        <td>{{ total }}</td>
+        <td>
+            {% if total %}
+                {{ total }}
+            {% else %}
+                Incomplete
+            {% endif %}
+        </td>
         <td>{{ date_time }}</td>
         <td>{{ entered_by }}</td>
         <td class="action">
-            <button name="tid" value="{{ tid }}">View</button>
+            {% if type == 's' %}
+                {% if total %}
+                    <form action="/sale_view" method="POST">
+                        <button name="tid" value="{{ tid }}">
+                            View
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="/sale_continue" method="POST">
+                        <button name="tid" value="{{ tid }}">
+                            Continue
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
         </td>
     </tr>
     {% endfor %}
-    
 
 </table>
 
