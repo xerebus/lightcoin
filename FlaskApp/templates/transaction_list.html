@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block pagetitle %}Transactions{% endblock %}
+
+{% block content %}
+
+<h1>Transactions</h1>
+
+<form action="/transaction" method="POST">
+<p class="pagination">
+    <button name="page" value={{ page|int - 1 }}>prev</button>
+    &nbsp;
+    Page {{ page|int + 1 }}
+    &nbsp;
+    <button name="page" value={{ page|int + 1 }}>next</button>
+</p>
+</form>
+
+<table>
+
+    <tr>
+        <th>Transaction ID</th>
+        <th>Transaction Type</th>
+        <th>Amount</th>
+        <th>Submitted On</th>
+        <th>Authorized By</th>
+        <th class="action">Action</th>
+    </tr>
+    
+    {% for (tid, date_time, entered_by, total, type) in transactions %}
+    <tr>
+        <td>{{ tid }}</td>
+        <td>
+            {% if type == 's' %}
+                Sale
+            {% elif type == 'o' %}
+                Order
+            {% elif type == 'b' %}
+                Breakage
+            {% else %}
+                Unknown
+            {% endif %}
+        </td>
+        <td>
+            {% if total %}
+                {{ total }}
+            {% else %}
+                Incomplete
+            {% endif %}
+        </td>
+        <td>{{ date_time }}</td>
+        <td>{{ entered_by }}</td>
+        <td class="action">
+            {% if total %}
+                <form action="/transaction_view" method="POST">
+                    <button name="tid" value="{{ tid }}">
+                        View
+                    </button>
+                </form>
+            {% else %}
+                <form action="/transaction_continue" method="POST">
+                    <button name="tid" value="{{ tid }}">
+                        Continue
+                    </button>
+                </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block pagetitle %}View Sale{% endblock %}
+
+{% block content %}
+
+<h1>Sale #{{ tid }}</h1>
+
+<table>
+
+    <tr>
+        <th>UPC</th>
+        <th>Product Name</th>
+        <th>Packs of</th>
+        <th>Unit Price</th>
+        <th>Quantity</th>
+    </tr>
+    
+    {% for (upc, name, pack_size, price, qty) in items %}
+    <tr>
+        <td>{{ upc }}</td>
+        <td>{{ name }}</td>
+        <td>{{ pack_size }}</td>
+        <td>{{ price }}</td>
+        <td>{{ qty }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<table>
+
+    <tr>
+        <th>Subtotal</th>
+        <th>Tax</th>
+        <th>Total</th>
+        <th>Tender</th>
+        <th>Customer</th>
+        <th>Paid By</th>
+        <th>Created On</th>
+        <th>Employee</th>
+    </tr>
+
+    <tr>
+        <td>{{ details['subtotal'] }}</td>
+        <td>{{ details['tax'] }}</td>
+        <td>{{ details['total'] }}</td>
+        <td>{{ details['tender'] }}</td>
+        <td>{{ details['customer'] }}</td>
+        <td>{{ details['payment_method'] }}</td>
+        <td>{{ details['date_time'] }}</td>
+        <td>{{ details['employee'] }}</td>
+    </tr>
+
+</table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+
+</form>
+
+
+
+{% endblock %}

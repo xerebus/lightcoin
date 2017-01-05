@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block pagetitle %}Make a Sale{% endblock %}
+
+{% block content %}
+
+<h1>Sale #{{ tid }}</h1>
+
+<form action="/transaction_finalize" method="POST">
+
+<table>
+
+    <tr>
+        <th>Subtotal</th>
+        <th>Payment Method</th>
+        <th>Customer</th>
+        <th>Tax</th>
+        <th>Total</th>
+        <th>Tender</th>
+        <th class="action">Checkout</th>
+    </tr>
+    
+    <tr>
+        <td>{{ subtotal }}</td>
+        <td>
+            <select name="payment_method">
+                <option value="cash">Cash</option>
+            </select>
+        </td>
+        <td>
+            <select name="cid">
+                {% for (cid, name, phone) in customers %}
+                <option value="{{ cid }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>{{ tax }}</td>
+        <td>{{ total }}</td>
+        <td>
+            <input type="text" name="tender" placeholder="Tender" />
+        </td>
+        <td class="action">
+            <button type="submit">Finalize</button>
+        </td>
+    </tr>
+
+</table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+<input type="hidden" name="subtotal" value="{{ subtotal }}" />
+<input type="hidden" name="tax" value="{{ tax }}" />
+<input type="hidden" name="total" value="{{ total }}" />
+
+</form>
+
+{% endblock %}

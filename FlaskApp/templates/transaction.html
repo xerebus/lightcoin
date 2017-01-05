@@ -1,74 +1,121 @@
 {% extends "base.html" %}
-{% block pagetitle %}Transactions{% endblock %}
+{% block pagetitle %}Edit Transaction{% endblock %}
 
 {% block content %}
 
-<h1>Transactions</h1>
+<h1>
+{% if transaction_type == 's' %}Sale
+{% elif transaction_type == 'o' %}Order
+{% elif transaction_type == 'b' %}Breakage
+{% endif %}
+#{{ tid }}
+</h1>
 
-<form action="/transaction" method="POST">
-<p class="pagination">
-    <button name="page" value={{ page|int - 1 }}>prev</button>
-    &nbsp;
-    Page {{ page|int + 1 }}
-    &nbsp;
-    <button name="page" value={{ page|int + 1 }}>next</button>
-</p>
-</form>
+<form action="/transaction_delete" method="POST">
 
 <table>
 
     <tr>
-        <th>Transaction ID</th>
-        <th>Transaction Type</th>
-        <th>Amount</th>
-        <th>Submitted On</th>
-        <th>Authorized By</th>
-        <th class="action">Action</th>
+        <th>UPC</th>
+        <th>Product Name</th>
+        <th>Packs of</th>
+        <th>Unit Price</th>
+        <th>Quantity</th>
+        <th class="action">Modify</th>
     </tr>
     
-    {% for (tid, date_time, entered_by, total, type) in transactions %}
+    {% for (upc, name, pack_size, price, qty) in items %}
     <tr>
-        <td>{{ tid }}</td>
-        <td>
-            {% if type == 's' %}
-                Sale
-            {% elif type == 'o' %}
-                Order
-            {% elif type == 'b' %}
-                Breakage
-            {% else %}
-                Unknown
-            {% endif %}
-        </td>
-        <td>
-            {% if total %}
-                {{ total }}
-            {% else %}
-                Incomplete
-            {% endif %}
-        </td>
-        <td>{{ date_time }}</td>
-        <td>{{ entered_by }}</td>
+        <td>{{ upc }}</td>
+        <td>{{ name }}</td>
+        <td>{{ pack_size }}</td>
+        <td>{{ price }}</td>
+        <td>{{ qty }}</td>
         <td class="action">
-            {% if type == 's' %}
-                {% if total %}
-                    <form action="/sale_view" method="POST">
-                        <button name="tid" value="{{ tid }}">
-                            View
-                        </button>
-                    </form>
-                {% else %}
-                    <form action="/sale_continue" method="POST">
-                        <button name="tid" value="{{ tid }}">
-                            Continue
-                        </button>
-                    </form>
-                {% endif %}
-            {% endif %}
+            <button name="upc" value="{{ upc }}"
+            type="submit">Delete</button>
         </td>
     </tr>
     {% endfor %}
 
 </table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+
+</form>
+
+<h1>Add Item</h1>
+
+<form action="/transaction_add" method="POST">
+
+<table>
+
+    <tr>
+
+        <td>
+            <input type="text" name="upc" placeholder="UPC"
+            autofocus />
+        </td>
+
+        <td class="action">
+            <button action=type="submit">Add</button>
+        </td>
+    </tr>
+</table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+
+</form>
+
+
+{% if transaction_type == 's' %}
+
+<h1>Checkout</h1>
+<form action="/sale_checkout" method="POST">
+
+{% elif transaction_type == 'o' %}
+
+<h1>Save</h1>
+<form action="/order_checkout" method="POST">
+
+{% elif transaction_type == 'b' %}
+
+<h1>Save</h1>
+<form action="/breakage_finalize" method="POST">
+
+{% endif %}
+
+<table>
+
+    <tr>
+        {% if transaction_type == 's' %}
+        <th>Subtotal</th>
+        <th>Tax</th>
+        {% endif %}
+        <th>Total</th>
+        <th class="action">Save</th>
+    </tr>
+
+    <tr>
+        {% if transaction_type == 's' %}
+        <td>{{ totals['subtotal'] }}</td>
+        <td>{{ totals['tax'] }}</td>
+        {% endif %}
+        <td>{{ totals['total'] }}</td>
+        <td class="action">
+            {% if transaction_type == 's' %}
+            <button type="submit">Checkout</button>
+            {% else %}
+            <button type="submit">Save</button>
+            {% endif %}
+        </td>
+    </tr>
+
+</table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+
+</form>
+
 
 {% endblock %}
