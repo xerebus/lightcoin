@@ -779,5 +779,49 @@ def finalize_sale():
         user = session.get('user')
     )
 
+
+## TRANSACTIONS INTERFACE
+
+@app.route('/transaction', methods=['POST', 'GET'])
+def transaction():
+    '''Display transaction list. Transactions cannot be removed
+    in the interface.'''
+    
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # parse page number
+    if request.method == 'POST':
+        page = int(request.form['page'])
+    else:
+        page = 0
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    
+    # number of items per page
+    list_limit = 10
+
+    # fetch product data
+    args = (list_limit, page * list_limit)
+    cursor.callproc('GetTransactions', args)
+    transactions = cursor.fetchall()
+        
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'transaction.html',
+        user = session.get('user'),
+        transactions = transactions,
+        page = page
+    )
+
 if __name__ == '__main__':
     app.run(debug = True)

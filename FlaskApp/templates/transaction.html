@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block pagetitle %}Transactions{% endblock %}
+
+{% block content %}
+
+<h1>Transactions</h1>
+
+<form action="/transaction" method="POST">
+<p class="pagination">
+    <button name="page" value={{ page|int - 1 }}>prev</button>
+    &nbsp;
+    Page {{ page|int + 1 }}
+    &nbsp;
+    <button name="page" value={{ page|int + 1 }}>next</button>
+</p>
+</form>
+
+<table>
+
+    <tr>
+        <th>Transaction ID</th>
+        <th>Transaction Type</th>
+        <th>Amount</th>
+        <th>Date and Time</th>
+        <th>Authorized By</th>
+        <th class="action">View</th>
+    </tr>
+    
+    {% for (tid, date_time, entered_by, total, type) in transactions %}
+    <tr>
+        <td>{{ tid }}</td>
+        <td>
+            {% if type == 's' %}
+                Sale
+            {% elif type == 'o' %}
+                Order
+            {% elif type == 'b' %}
+                Breakage
+            {% else %}
+                Unknown
+            {% endif %}
+        </td>
+        <td>{{ total }}</td>
+        <td>{{ date_time }}</td>
+        <td>{{ entered_by }}</td>
+        <td class="action">
+            <button name="tid" value="{{ tid }}">View</button>
+        </td>
+    </tr>
+    {% endfor %}
+    
+
+</table>
+
+{% endblock %}
