@@ -687,10 +687,20 @@ def add_to_transaction():
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        # call 
+        # figure out whether transaction is add or remove
+        args = (request.form['tid'],)
+        cursor.callproc('GetTransactionType', args)
+        transaction_type = cursor.fetchone()[0]
+        if transaction_type == 'o':
+            add_or_remove = 1
+        else:
+            add_or_remove = -1
+
+        # add item
         args = (
             request.form['upc'],
-            request.form['tid']
+            request.form['tid'],
+            add_or_remove
         )
         cursor.callproc('AddItemToTransaction', args)
         conn.commit()
@@ -717,11 +727,21 @@ def delete_from_transaction():
         # connect to MySQL database
         conn = mysql.connect()
         cursor = conn.cursor()
+        
+        # figure out whether transaction is add or remove
+        args = (request.form['tid'],)
+        cursor.callproc('GetTransactionType', args)
+        transaction_type = cursor.fetchone()[0]
+        if transaction_type == 'o':
+            add_or_remove = 1
+        else:
+            add_or_remove = -1
 
-        # delete user
+        # delete item
         args = (
             request.form['upc'],
-            request.form['tid']
+            request.form['tid'],
+            add_or_remove
         )
         cursor.callproc('DeleteItemFromTransaction', args)
         conn.commit()
