@@ -95,7 +95,7 @@ def logout():
 
 @app.route('/home')
 def home():
-    '''Display a default homepage.'''
+    '''Display some sales statistics.'''
 
     # login-only page
     if not session.get('user'):
@@ -104,7 +104,26 @@ def home():
             error = 'Unauthorized access.'
         )
 
-    return render_template('home.html', user = session.get('user'))
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    # get top sellers and top grossing items
+    cursor.callproc('GetTopSellers')
+    top_sellers = cursor.fetchall()
+    cursor.callproc('GetTopGrossing')
+    top_grossing = cursor.fetchall()
+
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'home.html',
+        top_sellers = top_sellers,
+        top_grossing = top_grossing,
+        user = session.get('user')
+    )
 
 
 ## EMPLOYEE/USER MANAGEMENT INTERFACE
