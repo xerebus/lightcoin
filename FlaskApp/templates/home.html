@@ -10,14 +10,18 @@
 <table>
 
     <tr>
-        <th>Item</th>
+        <th>UPC</th>
+        <th>Item Name</th>
+        <th>Packs Of</th>
         <th>Quantity Sold</th>
     </tr>
 
-    {% for (name, qty) in top_sellers %}
+    {% for (upc, name, pack_size, qty) in top_sellers %}
 
     <tr>
+        <td>{{ upc }}</td>
         <td>{{ name }}</td>
+        <td>{{ pack_size }}</td>
         <td>{{ qty }}</td>
     </tr>
 
@@ -30,14 +34,18 @@
 <table>
 
     <tr>
-        <th>Item</th>
+        <th>UPC</th>
+        <th>Item Name</th>
+        <th>Packs Of</th>
         <th>Revenue</th>
     </tr>
 
-    {% for (name, revenue) in top_grossing %}
+    {% for (upc, name, pack_size, revenue) in top_grossing %}
 
     <tr>
+        <td>{{ upc }}</td>
         <td>{{ name }}</td>
+        <td>{{ pack_size }}</td>
         <td>{{ revenue }}</td>
     </tr>
 
