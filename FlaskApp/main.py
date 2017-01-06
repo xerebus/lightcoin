@@ -564,30 +564,41 @@ def delete_vendor():
     return redirect('/vendor')
 
 
-## MAKE SALE INTERFACE
+## SALE/ORDER/BREAKAGE INTERFACE
 
 @app.route('/sale_new')
 def new_sale():
-    '''Initiate a new sale and send the user to the sale page.'''
+    return new_transaction('s')
+
+@app.route('/order_new')
+def new_order():
+    return new_transaction('o')
+
+@app.route('/breakage_new')
+def new_breakage():
+    return new_transaction('b')
+
+def new_transaction(transaction_type):
+    '''Initiate a new transaction and send the user to the transaction page.'''
 
     # connect to MySQL database
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    # start a sale and grab its transaction_id
-    args = (session.get('user'),)
-    cursor.callproc('StartSale', args)
-    sale_id = cursor.fetchone()[0]
+    # start a transaction and grab its transaction_id
+    args = (session.get('user'), transaction_type)
+    cursor.callproc('StartTransaction', args)
+    transaction_id = cursor.fetchone()[0]
     conn.commit()
         
     # close connection
     cursor.close()
     conn.close()
 
-    return sale(sale_id)
+    return transaction(transaction_id)
 
-def sale(sale_id):
-    '''List current sale and allow adding items.'''
+def transaction(transaction_id):
+    '''List current transaction and allow adding items.'''
 
     # login-only page
     if not session.get('user'):
@@ -600,33 +611,67 @@ def sale(sale_id):
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    # show this sale
-    args = (sale_id,)
-    cursor.callproc('ViewSale', args)
+    # show this transaction
+    args = (transaction_id,)
+    cursor.callproc('ViewTransaction', args)
     items = cursor.fetchall()
+
+    # get transaction type
+    args = (transaction_id,)
+    cursor.callproc('GetTransactionType', args)
+    transaction_type = cursor.fetchone()[0]
+
+    # assemble subtotal, tax, total, etc.
+    totals = {}
+
+    if transaction_type == 's':
+            
+        args = (transaction_id,)
+        cursor.callproc('CalculateSaleInfo', args)
+        subtotal, tax, total = cursor.fetchone()
+
+        totals['subtotal'] = subtotal
+        totals['tax'] = tax
+        totals['total'] = total
+
+    else:
         
-    # grab subtotal and total
-    args = (sale_id,)
-    cursor.callproc('CalculateSaleTotal', args)
-    subtotal, tax, total = cursor.fetchone()
+        args = (transaction_id,)
+        cursor.callproc('CalculateTransactionTotal', args)
+        total = cursor.fetchone()[0]
+        
+        totals['total'] = total
 
     # close connection
     cursor.close()
     conn.close()
 
     return render_template(
-        'sale.html',
+        'transaction.html',
         user = session.get('user'),
-        tid = sale_id,
+        tid = transaction_id,
         items = items,
-        subtotal = subtotal,
-        tax = tax,
-        total = total
+        transaction_type = transaction_type,
+        totals = totals
     )
 
-@app.route('/sale_add', methods = ['POST'])
-def add_to_sale():
-    '''Add an item to a sale. The SQL stored procedure handles updating
+@app.route('/transaction_continue', methods = ['POST'])
+def continue_transaction():
+    '''Allows finishing an incomplete transaction.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+        return transaction(int(request.form['tid']))
+
+@app.route('/transaction_add', methods = ['POST'])
+def add_to_transaction():
+    '''Add an item to a transaction. The SQL stored procedure handles updating
     the quantity or adding a new line_item as needed.'''
 
     # login-only page
@@ -647,18 +692,18 @@ def add_to_sale():
             request.form['upc'],
             request.form['tid']
         )
-        cursor.callproc('AddItemToSale', args)
+        cursor.callproc('AddItemToTransaction', args)
         conn.commit()
 
         # close connection
         cursor.close()
         conn.close()
 
-    return sale(request.form['tid'])
+    return transaction(request.form['tid'])
 
-@app.route('/sale_delete', methods = ['POST'])
-def delete_from_employee():
-    '''Removes a line item from a sale.'''
+@app.route('/transaction_delete', methods = ['POST'])
+def delete_from_transaction():
+    '''Removes a line item from a transaction.'''
 
     # login-only page
     if not session.get('user'):
@@ -678,18 +723,102 @@ def delete_from_employee():
             request.form['upc'],
             request.form['tid']
         )
-        cursor.callproc('DeleteItemFromSale', args)
+        cursor.callproc('DeleteItemFromTransaction', args)
         conn.commit()
 
         # close connection
         cursor.close()
         conn.close()
 
-    return sale(request.form['tid'])
+    return transaction(request.form['tid'])
+
+@app.route('/transaction_view', methods = ['POST'])
+def view_transaction():
+    '''List a previously entered transaction. Only lookups - no computation or
+    editability.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    # connect to MySQL database
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    # grab transaction ID
+    transaction_id = request.form['tid']
+
+    # show this transaction
+    args = (transaction_id,)
+    cursor.callproc('ViewTransaction', args)
+    items = cursor.fetchall()
+
+    # get transaction type
+    args = (transaction_id,)
+    cursor.callproc('GetTransactionType', args)
+    transaction_type = cursor.fetchone()[0]
+
+    # assemble details
+    details = {}
+    
+    if transaction_type == 's':
+        
+        args = (transaction_id,)
+        cursor.callproc('GetSaleDetails', args)
+        data = cursor.fetchone()
+        payment, total, tax, tender, customer, employee, date_time = data
+
+        details['payment'] = payment
+        details['total'] = total
+        details['tax'] = tax
+        details['subtotal'] = float(total) - float(tax)
+        details['tender'] = tender
+        details['customer'] = customer
+        details['employee'] = employee
+        details['date_time'] = date_time
+
+    elif transaction_type == 'o':
+
+        args = (transaction_id,)
+        cursor.callproc('GetOrderDetails', args)
+        data = cursor.fetchone()
+        total, vendor, employee, date_time = data
+
+        details['total'] = total
+        details['vendor'] = vendor
+        details['employee'] = employee
+        details['date_time'] = date_time
+    
+    elif transaction_type == 'b':
+
+        args = (transaction_id,)
+        cursor.callproc('GetBreakageDetails', args)
+        data = cursor.fetchone()
+        total, employee, date_time = data
+
+        details['total'] = total
+        details['employee'] = employee
+        details['date_time'] = date_time
+
+    # close connection
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'transaction_view.html',
+        user = session.get('user'),
+        tid = transaction_id,
+        items = items,
+        transaction_type = transaction_type,
+        details = details
+    )
 
 @app.route('/sale_checkout', methods = ['POST'])
 def checkout_sale():
-    '''Requests checkout information.'''
+    '''Requests checkout information for a sale.'''
 
     # login-only page
     if not session.get('user'):
@@ -706,7 +835,7 @@ def checkout_sale():
 
         # grab subtotal and total
         args = (request.form['tid'],)
-        cursor.callproc('CalculateSaleTotal', args)
+        cursor.callproc('CalculateSaleInfo', args)
         subtotal, tax, total = cursor.fetchone()
 
         # grab customers
@@ -731,6 +860,48 @@ def checkout_sale():
             customers = customers
     )
 
+@app.route('/order_checkout', methods = ['POST'])
+def checkout_order():
+    '''Requests checkout information for an order.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # grab total
+        args = (request.form['tid'],)
+        cursor.callproc('CalculateTransactionTotal', args)
+        total = cursor.fetchone()[0]
+
+        # grab vendors
+        args = (
+            200, # number of customers to show in dropdown
+            0 # start at beginning
+        )
+        cursor.callproc('GetVendors', args)
+        vendors = cursor.fetchall()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return render_template(
+            'order_checkout.html',
+            user = session.get('user'),
+            tid = request.form['tid'],
+            total = total,
+            vendors = vendors
+    )
+
 @app.route('/sale_finalize', methods = ['POST'])
 def finalize_sale():
     '''Records a sale.'''
@@ -749,7 +920,7 @@ def finalize_sale():
         cursor = conn.cursor()
 
 
-        # collect and save sale information
+        # collect and save transaction information
         tid, total, tender = (
             request.form['tid'],
             request.form['total'],
@@ -779,11 +950,94 @@ def finalize_sale():
         user = session.get('user')
     )
 
+@app.route('/order_finalize', methods = ['POST'])
+def finalize_order():
+    '''Records an order.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # collect and save order information
+        tid, total = (
+            request.form['tid'],
+            request.form['total'],
+        )
+        args = (
+            tid,
+            total,
+            request.form['vid'],
+        )
+        cursor.callproc('FinalizeOrder', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return render_template(
+        'order_done.html',
+        tid = tid,
+        total = total,
+        user = session.get('user')
+    )
+
+@app.route('/breakage_finalize', methods = ['POST'])
+def finalize_breakage():
+    '''Records a breakage.'''
+
+    # login-only page
+    if not session.get('user'):
+        return render_template(
+            'error.html',
+            error = 'Unauthorized access.'
+        )
+
+    if request.method == 'POST':
+
+        # connect to MySQL database
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # grab total
+        args = (request.form['tid'],)
+        cursor.callproc('CalculateTransactionTotal', args)
+        total = cursor.fetchone()[0]
+
+        # collect and save transaction information
+        tid = request.form['tid']
+        args = (
+            tid,
+            total
+        )
+        cursor.callproc('FinalizeBreakage', args)
+        conn.commit()
+
+        # close connection
+        cursor.close()
+        conn.close()
+
+    return render_template(
+        'breakage_done.html',
+        tid = tid,
+        total = total,
+        user = session.get('user')
+    )
+
 
 ## TRANSACTIONS INTERFACE
 
 @app.route('/transaction', methods=['POST', 'GET'])
-def transaction():
+def list_transaction():
     '''Display transaction list. Transactions cannot be removed
     in the interface.'''
     
@@ -817,11 +1071,14 @@ def transaction():
     conn.close()
 
     return render_template(
-        'transaction.html',
+        'transaction_list.html',
         user = session.get('user'),
         transactions = transactions,
         page = page
     )
+
+
+## MAIN
 
 if __name__ == '__main__':
     app.run(debug = True)

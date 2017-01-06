@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block pagetitle %}Add Inventory{% endblock %}
+
+{% block content %}
+
+<h1>Order #{{ tid }}</h1>
+
+<table>
+
+    <tr>
+        <th>Total</th>
+    </tr>
+    
+    <tr>
+        <td>{{ total }}</td>
+    </tr>
+
+</table>
+
+<p>Order entered.</p>
+
+{% endblock %}

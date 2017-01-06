@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block pagetitle %}Report Breakage{% endblock %}
+
+{% block content %}
+
+<h1>Breakage #{{ tid }}</h1>
+
+<table>
+
+    <tr>
+        <th>Total</th>
+    </tr>
+    
+    <tr>
+        <td>{{ total }}</td>
+    </tr>
+
+</table>
+
+<p>Breakage entered.</p>
+
+{% endblock %}

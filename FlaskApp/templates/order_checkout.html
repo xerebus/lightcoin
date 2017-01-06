@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block pagetitle %}Add Inventory{% endblock %}
+
+{% block content %}
+
+<h1>Order #{{ tid }}</h1>
+
+<form action="/order_finalize" method="POST">
+
+<table>
+
+    <tr>
+        <th>Total</th>
+        <th>Vendor</th>
+        <th class="action">Save</th>
+    </tr>
+    
+    <tr>
+        <td>{{ total }}</td>
+        <td>
+            <select name="vid">
+                {% for (vid, name, rating) in vendors %}
+                <option value="{{ vid }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="action">
+            <button type="submit">Finalize</button>
+        </td>
+    </tr>
+
+</table>
+
+<input type="hidden" name="tid" value="{{ tid }}" />
+<input type="hidden" name="total" value="{{ total }}" />
+
+</form>
+
+{% endblock %}

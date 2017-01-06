@@ -3,7 +3,13 @@
 
 {% block content %}
 
-<h1>Sale #{{ tid }}</h1>
+<h1>
+{% if transaction_type == 's' %}Sale
+{% elif transaction_type == 'o' %}Order
+{% elif transaction_type == 'b' %}Breakage
+{% endif %}
+#{{ tid }}
+</h1>
 
 <table>
 
@@ -29,6 +35,8 @@
 
 <table>
 
+    {% if transaction_type == 's' %}
+
     <tr>
         <th>Subtotal</th>
         <th>Tax</th>
@@ -46,10 +54,42 @@
         <td>{{ details['total'] }}</td>
         <td>{{ details['tender'] }}</td>
         <td>{{ details['customer'] }}</td>
-        <td>{{ details['payment_method'] }}</td>
+        <td>{{ details['payment'] }}</td>
         <td>{{ details['date_time'] }}</td>
         <td>{{ details['employee'] }}</td>
     </tr>
+
+    {% elif transaction_type == 'o' %}
+    
+    <tr>
+        <th>Total</th>
+        <th>Vendor</th>
+        <th>Created On</th>
+        <th>Employee</th>
+    </tr>
+
+    <tr>
+        <td>{{ details['total'] }}</td>
+        <td>{{ details['vendor'] }}</td>
+        <td>{{ details['date_time'] }}</td>
+        <td>{{ details['employee'] }}</td>
+    </tr>
+
+    {% elif transaction_type == 'b' %}
+    
+    <tr>
+        <th>Total</th>
+        <th>Created On</th>
+        <th>Employee</th>
+    </tr>
+
+    <tr>
+        <td>{{ details['total'] }}</td>
+        <td>{{ details['date_time'] }}</td>
+        <td>{{ details['employee'] }}</td>
+    </tr>
+
+    {% endif %}
 
 </table>
 
