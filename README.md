@@ -3,11 +3,11 @@ lightcoin
 
 **lightcoin** is a web-based point-of-sale software for small,
 single-location retail stores. It can be used to:
-    * manage a store's inventory
-    * run the checkout lane
-    * record incoming shipments or loss of products
-    * keep track of customers and vendors
-    * report some basic sales statistics, such as top-selling items
+* manage a store's inventory
+* run the checkout lane
+* record incoming shipments or loss of products
+* keep track of customers and vendors
+* report some basic sales statistics, such as top-selling items
 
 lightcoin is currently incomplete -- see "Known Issues and Future Steps"
 below.
@@ -31,14 +31,14 @@ anything can be done with them (selling, recording shipments, etc.).
 Once you have entered some products, you can edit the inventory through
 three types of transactions (links on the left-hand side of the navigation
 bar):
-    * **Make Sale** -- This is the "checkout lane" interface. Items added
-      to a sale record will have their quantity reduced in the inventory.
-    * **Add Inventory** -- Use this to record the arrival of an order.
-      Items added to an order record will have their quantity increased in
-      the inventory.
-    * **Report Breakage** -- Use this to record loss of product. Items
-      added to a breakage report will have their quantity reduced in
-      the inventory.
+* **Make Sale** -- This is the "checkout lane" interface. Items added
+  to a sale record will have their quantity reduced in the inventory.
+* **Add Inventory** -- Use this to record the arrival of an order.
+  Items added to an order record will have their quantity increased in
+  the inventory.
+* **Report Breakage** -- Use this to record loss of product. Items
+  added to a breakage report will have their quantity reduced in
+  the inventory.
 
 The additional links on the right-hand side of the navigation bar can be
 used to manage **Customers**, **Vendors**, and **Employees**.
