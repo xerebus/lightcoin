@@ -719,6 +719,7 @@ def add_to_transaction():
         args = (
             request.form['upc'],
             request.form['tid'],
+            request.form['qty'],
             add_or_remove
         )
         cursor.callproc('AddItemToTransaction', args)
@@ -1120,4 +1121,4 @@ def list_transaction():
 ## MAIN
 
 if __name__ == '__main__':
-    app.run(debug = True, host="0.0.0.0")
+    app.run(debug = True, host = "0.0.0.0", processes = 4)
