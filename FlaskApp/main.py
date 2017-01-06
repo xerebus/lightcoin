@@ -24,7 +24,7 @@ mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'lightcoin'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'lightcoin_key'
 app.config['MYSQL_DATABASE_DB'] = 'store'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_HOST'] = '192.168.0.105'
 mysql.init_app(app)
 
 
@@ -1120,4 +1120,4 @@ def list_transaction():
 ## MAIN
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug = True, host="0.0.0.0")
