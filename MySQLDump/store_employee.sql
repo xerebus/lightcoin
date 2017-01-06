@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.16, for Linux (x86_64)
 --
--- Host: localhost    Database: store
+-- Host: 192.168.0.105    Database: store
 -- ------------------------------------------------------
 -- Server version	5.7.16-0ubuntu0.16.04.1
 
@@ -37,7 +37,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES ('abiswas','pbkdf2:sha1:1000$DoIhpq5l$d7c9f22fdc234602d128d83b77dad464b44dbcdf','2016-12-31',2),('admin','pbkdf2:sha1:1000$Yb7PNt5Z$7f3637e774b50237e52a4d4eaf435abc12245e0f','2016-12-30',3);
+INSERT INTO `employee` VALUES ('abiswas','pbkdf2:sha1:1000$DoIhpq5l$d7c9f22fdc234602d128d83b77dad464b44dbcdf','2016-12-31',2),('admin','pbkdf2:sha1:1000$Yb7PNt5Z$7f3637e774b50237e52a4d4eaf435abc12245e0f','2016-12-30',3),('google','pbkdf2:sha1:1000$tWLHdqqa$c763b1d74ba5c15f9bc971842253209cf9498b77','2017-01-06',2),('saaket','pbkdf2:sha1:1000$jbkdakEK$c9355cf6b3468630e2aca4f8521da9050f97c13e','2017-01-06',2);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-05 21:56:43
+-- Dump completed on 2017-01-06 14:23:04

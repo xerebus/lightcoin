@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.16, for Linux (x86_64)
 --
--- Host: localhost    Database: store
+-- Host: 192.168.0.105    Database: store
 -- ------------------------------------------------------
 -- Server version	5.7.16-0ubuntu0.16.04.1
 
@@ -40,6 +40,7 @@ CREATE TABLE `line_item` (
 
 LOCK TABLES `line_item` WRITE;
 /*!40000 ALTER TABLE `line_item` DISABLE KEYS */;
+INSERT INTO `line_item` VALUES (6,12334,2.99,1),(6,12449,10.99,25),(6,13001,4.99,1),(6,13052,16.99,50),(7,12333,1.99,1),(7,12335,9.99,1),(7,13051,7.99,1),(7,13052,16.99,30),(13,12335,9.99,1),(13,12449,10.99,1),(13,13001,4.99,1),(13,13051,7.99,1),(14,12448,6.99,42),(14,13001,4.99,1);
 /*!40000 ALTER TABLE `line_item` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-05 21:56:43
+-- Dump completed on 2017-01-06 14:23:03

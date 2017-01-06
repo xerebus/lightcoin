@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.16, for Linux (x86_64)
 --
--- Host: localhost    Database: store
+-- Host: 192.168.0.105    Database: store
 -- ------------------------------------------------------
 -- Server version	5.7.16-0ubuntu0.16.04.1
 
@@ -14,68 +14,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Temporary view structure for view `top_sellers`
---
-
-DROP TABLE IF EXISTS `top_sellers`;
-/*!50001 DROP VIEW IF EXISTS `top_sellers`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `top_sellers` AS SELECT 
- 1 AS `name`,
- 1 AS `items_sold`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Temporary view structure for view `top_grossing`
---
-
-DROP TABLE IF EXISTS `top_grossing`;
-/*!50001 DROP VIEW IF EXISTS `top_grossing`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `top_grossing` AS SELECT 
- 1 AS `name`,
- 1 AS `revenue`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Final view structure for view `top_sellers`
---
-
-/*!50001 DROP VIEW IF EXISTS `top_sellers`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `top_sellers` AS select `store`.`product_line`.`name` AS `name`,`top_sellers`.`items_sold` AS `items_sold` from ((((select `store`.`line_item`.`upc` AS `upc`,sum(`store`.`line_item`.`quantity`) AS `items_sold` from (`store`.`line_item` join `store`.`sale_details` on((`store`.`line_item`.`transaction_id` = `store`.`sale_details`.`transaction_id`))) group by `store`.`line_item`.`upc`)) `top_sellers` join `store`.`product` on((`top_sellers`.`upc` = `store`.`product`.`upc`))) join `store`.`product_line` on((`store`.`product`.`product_line_id` = `store`.`product_line`.`product_line_id`))) limit 5 */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `top_grossing`
---
-
-/*!50001 DROP VIEW IF EXISTS `top_grossing`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `top_grossing` AS select `store`.`product_line`.`name` AS `name`,`top_sellers`.`revenue` AS `revenue` from ((((select `store`.`line_item`.`upc` AS `upc`,sum((`store`.`line_item`.`quantity` * `store`.`line_item`.`unit_price`)) AS `revenue` from (`store`.`line_item` join `store`.`sale_details` on((`store`.`line_item`.`transaction_id` = `store`.`sale_details`.`transaction_id`))) group by `store`.`line_item`.`upc`)) `top_sellers` join `store`.`product` on((`top_sellers`.`upc` = `store`.`product`.`upc`))) join `store`.`product_line` on((`store`.`product`.`product_line_id` = `store`.`product_line`.`product_line_id`))) limit 5 */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Dumping routines for database 'store'
@@ -93,6 +31,7 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `AddItemToTransaction`(
 	IN p_upc INT,
     IN p_tid INT,
+    IN p_qty INT,
     IN p_add_or_remove INT
 )
 BEGIN
@@ -102,18 +41,18 @@ BEGIN
             WHERE transaction_id = p_tid AND upc = p_upc
         )
     ) THEN
-		UPDATE line_item SET quantity = quantity + 1
+		UPDATE line_item SET quantity = quantity + p_qty
         WHERE transaction_id = p_tid AND upc = p_upc;
 	ELSE
 		INSERT INTO line_item (transaction_id, upc, unit_price, quantity)
         VALUES (
 			p_tid, p_upc,
             (SELECT sale_price FROM product WHERE upc = p_upc),
-            '1'
+            p_qty
         );
 	END IF;
     
-    UPDATE product SET in_stock = in_stock + p_add_or_remove
+    UPDATE product SET in_stock = in_stock + (p_add_or_remove * p_qty)
     WHERE upc = p_upc;
 END ;;
 DELIMITER ;
@@ -696,7 +635,18 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTopGrossing`()
 BEGIN
-	SELECT * FROM top_grossing;
+	SELECT upc, name, pack_size, revenue
+	FROM (
+
+		(
+			(SELECT upc, SUM(quantity * unit_price) AS revenue
+			FROM (line_item NATURAL JOIN sale_details)
+			GROUP BY upc) AS top_grossing
+		) NATURAL JOIN product NATURAL JOIN product_line
+    
+	)
+	ORDER BY revenue DESC
+    LIMIT 5;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -715,7 +665,18 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTopSellers`()
 BEGIN
-	SELECT * FROM top_sellers;
+	SELECT upc, name, pack_size, items_sold
+	FROM (
+
+		(
+			(SELECT upc, SUM(quantity) AS items_sold
+			FROM (line_item NATURAL JOIN sale_details)
+			GROUP BY upc) AS top_sellers
+		) NATURAL JOIN product NATURAL JOIN product_line
+    
+	)
+	ORDER BY items_sold DESC
+    LIMIT 5;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -867,4 +828,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-05 21:56:44
+-- Dump completed on 2017-01-06 14:23:05

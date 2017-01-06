@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.16, for Linux (x86_64)
 --
--- Host: localhost    Database: store
+-- Host: 192.168.0.105    Database: store
 -- ------------------------------------------------------
 -- Server version	5.7.16-0ubuntu0.16.04.1
 
@@ -31,7 +31,7 @@ CREATE TABLE `inventory_transaction` (
   PRIMARY KEY (`transaction_id`),
   KEY `entered_by` (`entered_by`),
   CONSTRAINT `inventory_transaction_ibfk_1` FOREIGN KEY (`entered_by`) REFERENCES `employee` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,6 +40,7 @@ CREATE TABLE `inventory_transaction` (
 
 LOCK TABLES `inventory_transaction` WRITE;
 /*!40000 ALTER TABLE `inventory_transaction` DISABLE KEYS */;
+INSERT INTO `inventory_transaction` VALUES (5,'2017-01-06 22:00:40','saaket',NULL,'o'),(6,'2017-01-06 22:01:53','saaket',1132.23,'o'),(7,'2017-01-06 22:03:45','saaket',561.45,'s'),(8,'2017-01-06 22:02:28','saaket',NULL,'o'),(9,'2017-01-06 22:02:30','saaket',NULL,'s'),(10,'2017-01-06 22:02:31','saaket',NULL,'o'),(11,'2017-01-06 22:02:31','saaket',NULL,'b'),(12,'2017-01-06 22:02:32','saaket',NULL,'o'),(13,'2017-01-06 22:04:58','saaket',33.96,'o'),(14,'2017-01-06 22:06:47','saaket',298.57,'o');
 /*!40000 ALTER TABLE `inventory_transaction` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-05 21:56:43
+-- Dump completed on 2017-01-06 14:23:04
