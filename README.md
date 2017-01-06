@@ -99,3 +99,9 @@ Interface
 * **Tax rate** -- There is no interface to edit the tax rate, although it can
   be changed in the database. Future: allow changing the tax rate from
   lightcoin.
+
+Backend
+-------
+
+* **Code duplication** -- Many common idioms are repeated. Future: use more
+  helper functions and further combine common transaction features.
