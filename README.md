@@ -88,6 +88,12 @@ Security
 Interface
 ---------
 
+* **Type checking and error handling** -- There are several ways for the user
+  to enter bad input (nonexistent UPC, entering a letter as
+  a quantity, etc.) that will currently lead to a server error. Currently,
+  the user can just user their browser's back button and continue to work.
+  Future: check for these errors and handle them accordingly, highlighting
+  the field with an erroneous input.
 * **Store information** -- Currently the only store information stored is
   the tax rate. Future: store the store's name, address, phone number, etc.
 * **Tax rate** -- There is no interface to edit the tax rate, although it can
