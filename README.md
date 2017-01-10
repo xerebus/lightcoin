@@ -64,10 +64,17 @@ dump in `MySQLDump/`.
 Data Model
 ----------
 
-Below is an entity-relationship diagram for the database. Each box represents
+Below is a relational diagram for the database. Each box represents
 a table, and arrows between attributes represent foreign key references.
 
-![entity-relationship diagram](er_diagram.png)
+![relational diagram](rl_diagram.png)
+
+In terms of the entity-relationship model, `employee`, `vendor`, `customer`,
+`product`, and `product_line` are entity-sets. The `line_item`, for example,
+is a relationship-set between a transaction and a product. The `transaction`
+is an entity-set which is linked to other entities by implicit relationships:
+transactions are authorized by an `employee`, and sold to a `customer` or
+bought from a  `vendor`.
 
 Known Issues and Future Steps
 =============================
